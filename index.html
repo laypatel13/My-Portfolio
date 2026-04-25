@@ -1,0 +1,453 @@
+<!--I am using skill category label Id with my certification label too. and also contact-val class too.-->
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Portfolio - LayPatel</title>
+
+  <!-- Press Start 2P = authentic NES/Game Boy pixel font -->
+  <!-- VT323 = phosphor terminal font for body text (more readable) -->
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323:wght@400&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- Scanline overlay — sits on top of everything for CRT effect -->
+  <div id="scanlines"></div>
+
+  <!-- ============================================================
+       GAME SCREEN — the whole portfolio lives in here
+       ============================================================ -->
+  <div id="os-root">
+
+    <!-- Canvas for the pixel-rain / background animation -->
+    <canvas id="bg-canvas"></canvas>
+
+    <!-- ── TOP STATUS BAR ─────────────────────────────────────────
+         Styled like an NES HUD (health bar, score, lives).
+         CHANGE: id="topbar-left" for your name/title,
+                 id="topbar-right" shows the live clock.
+         ──────────────────────────────────────────────────────── -->
+    <div id="topbar">
+      <div id="topbar-left">
+        <!-- 8-bit pixel heart sprites -->
+        <span class="pixel-heart">♥</span>
+        <span class="pixel-heart">♥</span>
+        <span class="pixel-heart">♥</span>
+        &nbsp;&nbsp;ADVENTURER
+      </div>
+      <div id="topbar-center">* PORTFOLIO QUEST *</div>
+      <!-- CHANGE: "SCORE" can be anything — XP, coins, etc. -->
+      <div id="topbar-right">
+        <span id="clock-display">--:--</span>
+        &nbsp;&nbsp;SCORE:<span id="score-display">00000</span>
+      </div>
+    </div>
+
+
+    <!-- ── DESKTOP ─────────────────────────────────────────────── -->
+    <div id="desktop">
+
+      <!-- ── PRESS START splash — fades out on load ───────────── -->
+      <div id="welcome">
+        <!-- CHANGE: your name -->
+        <div class="welcome-title">LAY PATEL</div>
+        <!-- CHANGE: your role -->
+        <div class="welcome-sub">B.TECH CSE [ AI / ML ]</div>
+        <div class="welcome-sub2">ADANI UNIVERSITY</div>
+        <div class="press-start-blink">▶ PRESS ANY ICON TO START ◀</div>
+        <span class="cursor-blink">█</span>
+      </div>
+
+      <!-- ── DESKTOP ICONS ──────────────────────────────────────
+           Each icon = a "game menu option".
+           CHANGE top/left to reposition on desktop.
+           CHANGE onclick to open a different window.
+           ──────────────────────────────────────────────────── -->
+
+      <div class="app-icon" style="top:44px; left:18px" onclick="openWin('about')">
+        <div class="icon-box ic-about">
+          <!-- 8-bit pixel art face made of box-shadow dots -->
+          <div class="px-sprite px-face"></div>
+        </div>
+        <div class="icon-label">ABOUT</div>
+      </div>
+
+      <div class="app-icon" style="top:44px; left:112px" onclick="openWin('skills')">
+        <div class="icon-box ic-skills">
+          <div class="px-sprite px-sword"></div>
+        </div>
+        <div class="icon-label">SKILLS</div>
+      </div>
+
+      <div class="app-icon" style="top:44px; left:206px" onclick="openWin('projects')">
+        <div class="icon-box ic-projects">
+          <div class="px-sprite px-chest"></div>
+        </div>
+        <div class="icon-label">QUESTS</div>
+      </div>
+
+      <div class="app-icon" style="top:168px; left:18px" onclick="openWin('education')">
+        <div class="icon-box ic-education">
+          <div class="px-sprite px-book"></div>
+        </div>
+        <div class="icon-label">SCHOOL</div>
+      </div>
+
+      <div class="app-icon" style="top:168px; left:112px" onclick="openWin('contact')">
+        <div class="icon-box ic-contact">
+          <div class="px-sprite px-mail"></div>
+        </div>
+        <div class="icon-label">CONTACT</div>
+      </div>
+
+      <div class="app-icon" style="top:168px; left:206px" onclick="openWin('resume')">
+        <div class="icon-box ic-resume">
+          <div class="px-sprite px-scroll"></div>
+        </div>
+        <div class="icon-label">RESUME</div>
+      </div>
+
+    </div><!-- end #desktop -->
+
+
+    <!-- ============================================================
+         WINDOWS — each is a draggable NES-style dialog box.
+         NES windows use double-line borders (╔═╗ style via CSS).
+         HOW TO RESIZE: change width/height in the inline style.
+         HOW TO MOVE (start pos): change top/left in inline style.
+         ============================================================ -->
+
+
+    <!-- ── ABOUT WINDOW ─────────────────────────────────────────── -->
+    <div class="os-window" id="win-about" style="width:370px; height:300px; top:75px; left:75px;">
+      <div class="win-titlebar" onmousedown="dragStart(event, 'win-about')">
+        <!-- NES close = ✕ button on right side -->
+        <div class="win-title">[ PLAYER INFO ]</div>
+        <div class="win-close-btn" onclick="closeWin('about')">✕</div>
+      </div>
+      <div class="win-body">
+        <!-- CHANGE: your name & bio -->
+        <div class="nes-field">
+          <span class="nes-label">NAME :</span>
+          <span class="nes-val">LAY DHAVALKUMAR PATEL</span>
+        </div>
+        <div class="nes-field">
+          <span class="nes-label">CLASS:</span>
+          <span class="nes-val">COMPUTER SCIENCE & ENGINEERING</span>
+        </div>
+        <div class="nes-field">
+          <span class="nes-label">LEVEL  :</span>
+          <span class="nes-val">01 (1ST YEAR)</span>
+        </div>
+        <div class="nes-field">
+          <span class="nes-label">GUILD:</span>
+          <span class="nes-val">ADANI UNIVERSITY</span>
+        </div>
+        <div class="nes-divider">────────────────────</div>
+        <p class="nes-text">
+          ▶ FIRST-YEAR ADVENTURER ON THE JOURNEY.<br><br>
+          ▶ NEXT-ACHIEVEMENT
+          <span class="nes-highlight">[ Certified Associate in Python Programming - PCAP].</span><br><br>
+        </p>
+        <!-- CHANGE: add/remove tags -->
+        <div class="tag-row">
+          <div class="skill-category-label">▶ Python Institute</div>
+          <span class="tag"><a href="https://www.credly.com/badges/8c8ee792-d187-449b-992c-ab88d438e4c6/linked_in_profile" class="contact-val" target="_blank"> Certified Entry-Level Python Programmer </a></span>
+          
+          <div class="skill-category-label">▶ freeCodeCamp</div>
+          <span class="tag"><a href="https://freecodecamp.org/certification/laypatel/responsive-web-design-v9" class="contact-val" target="_blank"> Responsive Web Design V9 </a></span><br>
+          <span class="tag"><a href="https://freecodecamp.org/certification/laypatel/python-v9" class="contact-val" target="_blank"> Python V9 </a></span>
+
+          <div class="skill-category-label">▶ Harvard University</div>
+          <span class="tag"><a href="https://cs50.harvard.edu/certificates/661fd77d-c482-494d-bba5-bcab2c32be4c" class="contact-val" target="_blank"> CS50x - Introduction to computer science </a></span>
+
+          <div class="skill-category-label">▶ Be10x</div>
+          <span class="tag"><a href="https://certx.in/certificate/0270772f-3809-4400-b29b-1e1c61cd09971240358" class="contact-val" target="_blank"> AI Tools Workshop </a></span>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- ── SKILLS WINDOW ────────────────────────────────────────── -->
+    <div class="os-window" id="win-skills" style="width:380px; height:420px; top:65px; left:130px;">
+      <div class="win-titlebar" onmousedown="dragStart(event, 'win-skills')">
+        <div class="win-title">[ SKILL TREE ]</div>
+        <div class="win-close-btn" onclick="closeWin('skills')">✕</div>
+      </div>
+      <div class="win-body">
+
+        <!-- ── SKILL CARD FORMAT ───────────────────────────────────
+             Copy a .skill-card block to add a new skill.
+             Change: img src (devicon URL) + label text.
+             Icon browser: https://devicon.dev
+             URL: https://cdn.jsdelivr.net/gh/devicons/devicon/icons/{name}/{name}-original.svg
+             ──────────────────────────────────────────────────────── -->
+
+        <div class="skill-category-label">▶ LANGUAGES</div>
+        <div class="skill-grid">
+          <div class="skill-card">
+            <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg" alt="Python" />
+            <span>PYTHON</span>
+          </div>
+          <div class="skill-card">
+            <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/c/c-original.svg" alt="JavaScript" />
+            <span>C</span>
+          </div>
+          <div class="skill-card">
+            <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/html5/html5-original.svg" alt="HTML5" />
+            <span>HTML</span>
+          </div>
+          <div class="skill-card">
+            <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/css3/css3-original.svg" alt="CSS3" />
+            <span>CSS</span>
+          </div>
+          <div class="skill-card">
+            <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-original.svg" alt="JavaScript" />
+            <span>JS</span>
+          </div>
+        </div>
+
+        <div class="skill-category-label">▶ DATA &amp; ML</div>
+        <div class="skill-grid">
+          <div class="skill-card">
+            <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/numpy/numpy-original.svg" alt="NumPy" />
+            <span>NUMPY</span>
+          </div>
+          <div class="skill-card">
+            <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/pandas/pandas-original.svg" alt="Pandas" />
+            <span>PANDAS</span>
+          </div>
+          <div class="skill-card">
+            <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/matplotlib/matplotlib-original.svg" alt="Matplotlib" />
+            <span>MATPLOT</span>
+          </div>
+        </div>
+        
+        <div class="skill-category-label">▶ WEB &amp; GAME</div>
+        <div class="skill-grid">
+          <div class="skill-card">
+            <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/flask/flask-original.svg" alt="Flask" />
+            <span>FLASK</span>
+          </div>
+          <div class="skill-card">
+            <img src="https://raw.githubusercontent.com/tailwindlabs/heroicons/master/src/24/outline/exclamation-circle.svg" alt="Flask" />
+            <span>PYGAME</span>
+          </div>
+        </div>
+
+        <div class="skill-category-label">▶ TOOLS</div>
+        <div class="skill-grid">
+          <div class="skill-card">
+            <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/git/git-original.svg" alt="Git" />
+            <span>GIT</span>
+          </div>
+          <div class="skill-card">
+            <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg" alt="GitHub" class="icon-invert" />
+            <span>GITHUB</span>
+          </div>
+          <div class="skill-card">
+            <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/vscode/vscode-original.svg" alt="VS Code" />
+            <span>VSCODE</span>
+          </div>
+          <div class="skill-card">
+            <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/sqlite/sqlite-original.svg" alt="SQLite" />
+            <span>SQLITE</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+
+    <!-- ── PROJECTS WINDOW ──────────────────────────────────────── -->
+    <div class="os-window" id="win-projects" style="width:390px; height:370px; top:55px; left:190px;">
+      <div class="win-titlebar" onmousedown="dragStart(event, 'win-projects')">
+        <div class="win-title">[ QUEST LOG ]</div>
+        <div class="win-close-btn" onclick="closeWin('projects')">✕</div>
+      </div>
+      <div class="win-body">
+        <!-- CHANGE: your GitHub username -->
+        <div class="nes-subtitle">github.com/laypatel13</div>
+
+        <!-- ── PROJECT CARD FORMAT ─────────────────────────────────
+             Copy a .proj-card block to add a new project.
+             Change: the quest name, description, tags, and href.
+             ──────────────────────────────────────────────────────── -->
+
+        <div class="proj-card">
+          <div class="proj-header">
+            <span class="proj-icon">🎯</span>
+            <span class="proj-name">AIM TRAINER</span>
+            <span class="proj-status">✔ DONE</span>
+          </div>
+          <p>FUN TASK WITH PYGAME & OOP.</p>
+          <div class="proj-footer">
+            <span class="tag">PYTHON</span><span class="tag">PYGAME</span><span class="tag">OOP</span>
+            <a class="proj-link" href="https://github.com/laypatel13/aim-traineR" target="_blank">[ VIEW ]</a>
+          </div>
+        </div>
+
+        <div class="proj-card">
+          <div class="proj-header">
+            <span class="proj-icon">🧹</span>
+            <span class="proj-name">DATA WASH</span>
+            <span class="proj-status" style="color:red">✘ WORKING</span>
+          </div>
+          <p>A WEB APP TO CLEAN & ANALYZE .CSV FILE.</p>
+          <div class="proj-footer">
+            <span class="tag">PYTHON</span><span class="tag">NUMPY</span><span class="tag">PANDAS</span><span class="tag">MATPLOTLIB-SEABORN</span>
+            <a class="proj-link" href="https://github.com/laypatel13/DataWash" target="_blank">[ VIEW ]</a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+
+    <!-- ── EDUCATION WINDOW ─────────────────────────────────────── -->
+    <div class="os-window" id="win-education" style="width:340px; height:270px; top:95px; left:110px;">
+      <div class="win-titlebar" onmousedown="dragStart(event, 'win-education')">
+        <div class="win-title">[ LORE / HISTORY ]</div>
+        <div class="win-close-btn" onclick="closeWin('education')">✕</div>
+      </div>
+      <div class="win-body">
+
+        <!-- CHANGE: copy an .edu-item block to add a new entry -->
+
+        <div class="edu-item">
+          <div class="edu-dot">▶</div>
+          <div class="edu-content">
+            <div class="edu-name">B.TECH — CSE (AI/ML)</div>
+            <div class="edu-org">ADANI UNIVERSITY, AHMEDABAD</div>
+            <div class="edu-yr">2025–2029 · LVL 1</div>
+          </div>
+        </div>
+
+        <div class="edu-item">
+          <div class="edu-dot">▶</div>
+          <div class="edu-content">
+            <div class="edu-name">HIGHER SECONDARY</div>
+            <div class="edu-org">TAXSHILA VIDHHYALAYA</div>
+            <div class="edu-yr">2023-2025 · SCIENCE PERCENTAGE 90.67%</div>
+          </div>
+        </div>
+
+        <div class="edu-item">
+          <div class="edu-dot">▶</div>
+          <div class="edu-content">
+            <div class="edu-name">SECONDARY</div>
+            <div class="edu-org">NALANDA VIDHHYALAYA</div>
+            <div class="edu-yr">2021-2023 · PERCENTAGE 90.67%</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+
+    <!-- ── CONTACT WINDOW ───────────────────────────────────────── -->
+    <div class="os-window" id="win-contact" style="width:320px; height:270px; top:105px; left:155px;">
+      <div class="win-titlebar" onmousedown="dragStart(event, 'win-contact')">
+        <div class="win-title">[ SEND MESSAGE ]</div>
+        <div class="win-close-btn" onclick="closeWin('contact')">✕</div>
+      </div>
+      <div class="win-body">
+
+        <!-- CHANGE: update each href and display value -->
+
+        <div class="contact-row">
+          <span class="contact-icon">💻</span>
+          <div>
+            <div class="contact-label">GITHUB</div>
+            <a class="contact-val" href="https://github.com/laypatel13" target="_blank">github.com/laypatel13</a>
+          </div>
+        </div>
+
+        <div class="contact-row">
+          <span class="contact-icon">🔗</span>
+          <div>
+            <div class="contact-label">LINKEDIN</div>
+            <!-- CHANGE: your LinkedIn URL -->
+            <a class="contact-val" href="https://linkedin.com/in/laypatel" target="_blank">linkedin.com/in/laypatel13</a>
+          </div>
+        </div>
+
+        <div class="contact-row">
+          <span class="contact-icon">📨</span>
+          <div>
+            <div class="contact-label">EMAIL</div>
+            <!-- CHANGE: your email -->
+            <a class="contact-val" href="mailto:lay.patel.1313@gmail.com">lay.patel.1313@gmail.com</a>
+          </div>
+        </div>
+
+        <div class="contact-row">
+          <span class="contact-icon">📍</span>
+          <div>
+            <div class="contact-label">LOCATION</div>
+            <div class="contact-val">AHMEDABAD, GUJRAT, INDIA</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+
+    <!-- ── RESUME WINDOW ────────────────────────────────────────── -->
+    <div class="os-window" id="win-resume" style="width:320px; height:250px; top:115px; left:175px;">
+      <div class="win-titlebar" onmousedown="dragStart(event, 'win-resume')">
+        <div class="win-title">[ ITEM CHEST ]</div>
+        <div class="win-close-btn" onclick="closeWin('resume')">✕</div>
+      </div>
+      <div class="win-body">
+        <p class="nes-text">
+          YOU FOUND THE RESUME SCROLL!<br>
+          IT CONTAINS SKILLS, QUESTS &amp;<br>
+          ACHIEVEMENTS. EQUIP IT NOW?
+        </p>
+        <div class="nes-divider">────────────────────</div>
+        <!-- CHANGE: replace href with your actual resume PDF link -->
+        <a class="resume-btn" href="#" target="_blank">
+          ▶ YES — DOWNLOAD SCROLL
+        </a>
+        <!-- CHANGE: replace href with your LinkedIn URL -->
+        <a class="resume-btn secondary" href="https://linkedin.com/in/laypatel" target="_blank">
+          ▶ VIEW LINKEDIN PROFILE
+        </a>
+        <a class="resume-btn ghost" onclick="closeWin('resume')">
+          ✕ NO THANKS — GO BACK
+        </a>
+      </div>
+    </div>
+
+
+    <!-- ── TASKBAR / DOCK ──────────────────────────────────────────
+         Bottom NES-style menu bar.
+         Add a .dock-btn for each new window you add.
+         ──────────────────────────────────────────────────────── -->
+    <div id="taskbar">
+      <div id="dock">
+        <div class="dock-btn" id="dock-about"     title="About"     onclick="openWin('about')">👤</div>
+        <div class="dock-sep">┃</div>
+        <div class="dock-btn" id="dock-skills"    title="Skills"    onclick="openWin('skills')">🍳</div>
+        <div class="dock-sep">┃</div>
+        <div class="dock-btn" id="dock-projects"  title="Projects"  onclick="openWin('projects')">🗺</div>
+        <div class="dock-sep">┃</div>
+        <div class="dock-btn" id="dock-education" title="Education" onclick="openWin('education')">📖</div>
+        <div class="dock-sep">┃</div>
+        <div class="dock-btn" id="dock-contact"   title="Contact"   onclick="openWin('contact')">📡</div>
+        <div class="dock-sep">┃</div>
+        <div class="dock-btn" id="dock-resume"    title="Resume"    onclick="openWin('resume')">📜</div>
+      </div>
+    </div>
+
+  </div><!-- end #os-root -->
+
+  <script src="script.js"></script>
+</body>
+</html>

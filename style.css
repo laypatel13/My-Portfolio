@@ -1,0 +1,834 @@
+/* ================================================================
+   style.css — LAY.EXE Portfolio
+   THEME: 8-bit NES + Green Phosphor Terminal
+   ================================================================
+   MAIN GREEN:   #39ff14  (phosphor bright green)
+   DIM GREEN:    #1a8a00  (darker green for depth)
+   BG BLACK:     #020b02  (not pure black — slight green tint)
+   FONT:         Press Start 2P (headings), VT323 (body text)
+
+   TO CHANGE THE ACCENT COLOR: find/replace #39ff14
+   ================================================================ */
+
+
+/* ────────────────────────────────────────────────────────────────
+   1. RESET & BASE
+   ──────────────────────────────────────────────────────────────── */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background: #000;
+  /* Subtle grid pattern behind the whole page */
+  background-image:
+    linear-gradient(rgba(57,255,20,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(57,255,20,0.03) 1px, transparent 1px);
+  background-size: 32px 32px;
+  image-rendering: pixelated; /* keeps everything crisp */
+}
+
+/* ────────────────────────────────────────────────────────────────
+   2. CRT SCANLINE OVERLAY
+   A fixed div that covers the whole viewport with horizontal lines.
+   pointer-events:none so it doesn't block clicks.
+   ──────────────────────────────────────────────────────────────── */
+#scanlines {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 3px,
+    rgba(0, 0, 0, 0.18) 3px,   /* CHANGE: 0.18 opacity = how dark the lines are */
+    rgba(0, 0, 0, 0.18) 4px
+  );
+}
+
+/* ────────────────────────────────────────────────────────────────
+   3. MAIN SCREEN CONTAINER
+   ──────────────────────────────────────────────────────────────── */
+#os-root {
+  width: 100%;
+  max-width: 860px;
+  height: 640px;
+  background: #020b02;          /* dark green-black CRT background */
+  position: relative;
+  overflow: hidden;
+  /* NES-style chunky double border using outline + box-shadow trick */
+  border: 4px solid #39ff14;
+  outline: 4px solid #020b02;
+  box-shadow:
+    0 0 0 8px #39ff14,          /* outer green ring */
+    0 0 40px rgba(57,255,20,0.4),
+    0 0 80px rgba(57,255,20,0.15),
+    inset 0 0 80px rgba(0,0,0,0.6);
+  image-rendering: pixelated;
+}
+
+/* Pixel-rain canvas behind everything */
+#bg-canvas {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  opacity: 0.10;   /* CHANGE: raise to make rain more visible */
+}
+
+/* ────────────────────────────────────────────────────────────────
+   4. TOP STATUS BAR — NES HUD style
+   ──────────────────────────────────────────────────────────────── */
+#topbar {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 30px;
+  background: #000;
+  border-bottom: 3px solid #39ff14;  /* thick pixel border */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 10px;
+  z-index: 100;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;  /* Press Start 2P reads small — 8px is fine */
+}
+
+#topbar-left  { color: #39ff14; letter-spacing: 1px; }
+#topbar-center { color: rgba(57,255,20,0.5); letter-spacing: 2px; }
+#topbar-right  { color: #39ff14; letter-spacing: 1px; }
+
+/* Little pixel hearts in the HUD */
+.pixel-heart {
+  color: #ff4444;
+  text-shadow: 0 0 4px rgba(255,68,68,0.6);
+  font-size: 10px;
+}
+
+/* ────────────────────────────────────────────────────────────────
+   5. DESKTOP & APP ICONS
+   ──────────────────────────────────────────────────────────────── */
+#desktop {
+  position: absolute;
+  top: 30px;
+  bottom: 50px;
+  left: 0; right: 0;
+  z-index: 1;
+}
+
+/* Each icon wrapper */
+.app-icon {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+  padding: 6px;
+  /* NES selection highlight = pixelated box on hover */
+  transition: none;   /* no smooth transitions — keep it 8-bit */
+  user-select: none;
+  z-index: 2;
+  image-rendering: pixelated;
+}
+
+/* Selected state — the NES cursor box */
+.app-icon:hover  { outline: 2px solid #39ff14; background: rgba(57,255,20,0.07); }
+.app-icon:active { background: rgba(57,255,20,0.18); }
+
+/* Icon box — NES cartridge / item box style */
+.icon-box {
+  width: 52px;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Chunky double-pixel border = classic NES UI element */
+  border: 3px solid #39ff14;
+  outline: 2px solid #020b02;
+  box-shadow: inset 0 0 0 2px #1a8a00;
+  background: #030f03;
+  image-rendering: pixelated;
+  transition: none;
+}
+
+.app-icon:hover .icon-box {
+  background: #051a05;
+  box-shadow:
+    inset 0 0 0 2px #39ff14,
+    0 0 8px rgba(57,255,20,0.4);
+}
+
+/* Icon label — all caps, tiny pixel font */
+.icon-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 6px;
+  color: #39ff14;
+  text-align: center;
+  letter-spacing: 0.5px;
+  text-shadow: 0 0 6px rgba(57,255,20,0.6);
+}
+
+/* Icon background tints — subtle variation between icons */
+.ic-about     { background: #031203; }
+.ic-skills    { background: #020f02; }
+.ic-projects  { background: #031503; }
+.ic-education { background: #021002; }
+.ic-contact   { background: #031203; }
+.ic-resume    { background: #020d02; }
+
+/* ── Pixel Sprite "icons" ─────────────────────────────────────────
+   These are CSS box-shadow pixel art sprites.
+   Each px-* class draws a mini sprite using box-shadow dots.
+   1 "pixel" = 4px × 4px block.
+   CHANGE: replace with an <img> or emoji if you prefer.
+   ──────────────────────────────────────────────────────────────── */
+.px-sprite {
+  width: 4px;
+  height: 4px;
+  image-rendering: pixelated;
+}
+
+/* Pixel face sprite (for About) */
+.px-face {
+  background: #39ff14;
+  /* Each shadow = x y 0 spread color — draws pixel art dot by dot */
+  box-shadow:
+    4px 0 0 0 #39ff14, 8px 0 0 0 #39ff14, 16px 0 0 0 #39ff14, 20px 0 0 0 #39ff14,
+    0 4px 0 0 #39ff14, 4px 4px 0 0 #39ff14, 8px 4px 0 0 #39ff14, 12px 4px 0 0 #39ff14,16px 4px 0 0 #39ff14, 20px 4px 0 0 #39ff14, 24px 4px 0 0 #39ff14,
+    0 8px 0 0 #39ff14, 4px 8px 0 0 #1a8a00, 8px 8px 0 0 #39ff14, 12px 8px 0 0 #39ff14, 16px 8px 0 0 #39ff14, 20px 8px 0 0 #1a8a00, 24px 8px 0 0 #39ff14,
+    0 12px 0 0 #39ff14, 4px 12px 0 0 #39ff14, 8px 12px 0 0 #39ff14, 12px 12px 0 0 #39ff14, 16px 12px 0 0 #39ff14, 20px 12px 0 0 #39ff14, 24px 12px 0 0 #39ff14,
+    4px 16px 0 0 #39ff14, 8px 16px 0 0 #1a8a00, 16px 16px 0 0 #1a8a00, 20px 16px 0 0 #39ff14,
+    0 20px 0 0 #39ff14, 4px 20px 0 0 #39ff14, 8px 20px 0 0 #39ff14, 12px 20px 0 0 #39ff14, 16px 20px 0 0 #39ff14, 20px 20px 0 0 #39ff14, 24px 20px 0 0 #39ff14;
+}
+
+/* Sword sprite (for Skills) */
+.px-sword {
+  background: #39ff14;
+  box-shadow:
+    20px 0 0 0 #39ff14,
+    16px 4px 0 0 #39ff14,
+    12px 8px 0 0 #39ff14, 16px 8px 0 0 #1a8a00,
+    8px 12px 0 0 #39ff14, 12px 12px 0 0 #1a8a00,
+    4px 16px 0 0 #39ff14, 8px 16px 0 0 #1a8a00,
+    0 20px 0 0 #39ff14, 4px 20px 0 0 #1a8a00,
+    0 24px 0 0 #1a8a00,
+    8px 20px 0 0 #39ff14, 4px 24px 0 0 #39ff14;
+}
+
+/* Chest sprite (for Projects) */
+.px-chest {
+  background: #1a8a00;
+  box-shadow:
+    4px 0 0 0 #1a8a00, 8px 0 0 0 #1a8a00, 12px 0 0 0 #1a8a00, 16px 0 0 0 #1a8a00, 20px 0 0 0 #1a8a00,
+    0 4px 0 0 #39ff14, 4px 4px 0 0 #39ff14, 8px 4px 0 0 #39ff14, 12px 4px 0 0 #1a8a00, 16px 4px 0 0 #39ff14, 20px 4px 0 0 #39ff14, 24px 4px 0 0 #39ff14,
+    0 8px 0 0 #1a8a00, 4px 8px 0 0 #1a8a00, 8px 8px 0 0 #1a8a00, 12px 8px 0 0 #39ff14, 16px 8px 0 0 #1a8a00, 20px 8px 0 0 #1a8a00, 24px 8px 0 0 #1a8a00,
+    0 12px 0 0 #39ff14, 4px 12px 0 0 #39ff14, 8px 12px 0 0 #39ff14, 12px 12px 0 0 #39ff14, 16px 12px 0 0 #39ff14, 20px 12px 0 0 #39ff14, 24px 12px 0 0 #39ff14,
+    0 16px 0 0 #1a8a00, 4px 16px 0 0 #1a8a00, 8px 16px 0 0 #1a8a00, 12px 16px 0 0 #1a8a00, 16px 16px 0 0 #1a8a00, 20px 16px 0 0 #1a8a00, 24px 16px 0 0 #1a8a00;
+}
+
+/* Book (Education) */
+.px-book {
+  background: #39ff14;
+  box-shadow:
+    4px 0 0 0 #39ff14, 8px 0 0 0 #39ff14, 12px 0 0 0 #1a8a00, 16px 0 0 0 #39ff14, 20px 0 0 0 #39ff14,
+    0 4px 0 0 #39ff14, 4px 4px 0 0 #39ff14, 8px 4px 0 0 #39ff14, 12px 4px 0 0 #1a8a00, 16px 4px 0 0 #39ff14, 20px 4px 0 0 #39ff14, 24px 4px 0 0 #39ff14,
+    0 8px 0 0 #39ff14, 4px 8px 0 0 #1a8a00, 8px 8px 0 0 #1a8a00, 12px 8px 0 0 #1a8a00, 16px 8px 0 0 #1a8a00, 20px 8px 0 0 #1a8a00, 24px 8px 0 0 #39ff14,
+    0 12px 0 0 #39ff14, 4px 12px 0 0 #39ff14, 8px 12px 0 0 #39ff14, 12px 12px 0 0 #1a8a00, 16px 12px 0 0 #39ff14, 20px 12px 0 0 #39ff14, 24px 12px 0 0 #39ff14,
+    0 16px 0 0 #39ff14, 4px 16px 0 0 #39ff14, 8px 16px 0 0 #39ff14, 12px 16px 0 0 #1a8a00, 16px 16px 0 0 #39ff14, 20px 16px 0 0 #39ff14, 24px 16px 0 0 #39ff14,
+    0 20px 0 0 #1a8a00, 4px 20px 0 0 #1a8a00, 8px 20px 0 0 #1a8a00, 12px 20px 0 0 #1a8a00, 16px 20px 0 0 #1a8a00, 20px 20px 0 0 #1a8a00, 24px 20px 0 0 #1a8a00;
+}
+
+/* Mail / envelope (Contact) */
+.px-mail {
+  background: #39ff14;
+  box-shadow:
+    4px 0 0 0 #39ff14, 8px 0 0 0 #39ff14, 12px 0 0 0 #39ff14, 16px 0 0 0 #39ff14, 20px 0 0 0 #39ff14,
+    0 4px 0 0 #39ff14, 4px 4px 0 0 #1a8a00, 8px 4px 0 0 #39ff14, 12px 4px 0 0 #39ff14, 16px 4px 0 0 #39ff14, 20px 4px 0 0 #1a8a00, 24px 4px 0 0 #39ff14,
+    0 8px 0 0 #39ff14, 4px 8px 0 0 #39ff14, 8px 8px 0 0 #1a8a00, 12px 8px 0 0 #39ff14, 16px 8px 0 0 #1a8a00, 20px 8px 0 0 #39ff14, 24px 8px 0 0 #39ff14,
+    0 12px 0 0 #39ff14, 4px 12px 0 0 #39ff14, 8px 12px 0 0 #39ff14, 12px 12px 0 0 #1a8a00, 16px 12px 0 0 #39ff14, 20px 12px 0 0 #39ff14, 24px 12px 0 0 #39ff14,
+    0 16px 0 0 #1a8a00, 4px 16px 0 0 #1a8a00, 8px 16px 0 0 #1a8a00, 12px 16px 0 0 #1a8a00, 16px 16px 0 0 #1a8a00, 20px 16px 0 0 #1a8a00, 24px 16px 0 0 #1a8a00;
+}
+
+/* Scroll sprite (Resume) */
+.px-scroll {
+  background: #1a8a00;
+  box-shadow:
+    4px 0 0 0 #39ff14, 8px 0 0 0 #39ff14, 12px 0 0 0 #39ff14, 16px 0 0 0 #39ff14,
+    0 4px 0 0 #39ff14, 4px 4px 0 0 #39ff14, 8px 4px 0 0 #1a8a00, 12px 4px 0 0 #1a8a00, 16px 4px 0 0 #39ff14, 20px 4px 0 0 #39ff14,
+    0 8px 0 0 #39ff14, 4px 8px 0 0 #1a8a00, 8px 8px 0 0 #39ff14, 12px 8px 0 0 #39ff14, 16px 8px 0 0 #1a8a00, 20px 8px 0 0 #39ff14,
+    0 12px 0 0 #39ff14, 4px 12px 0 0 #39ff14, 8px 12px 0 0 #1a8a00, 12px 12px 0 0 #1a8a00, 16px 12px 0 0 #39ff14, 20px 12px 0 0 #39ff14,
+    4px 16px 0 0 #39ff14, 8px 16px 0 0 #39ff14, 12px 16px 0 0 #39ff14, 16px 16px 0 0 #39ff14;
+}
+
+
+/* ────────────────────────────────────────────────────────────────
+   6. WINDOWS — NES Dialog Box Style
+   Classic NES windows have thick double-line borders.
+   We simulate this with border + outline + box-shadow layers.
+   ──────────────────────────────────────────────────────────────── */
+.os-window {
+  position: absolute;
+  background: #010801;
+  /* NES double-border effect: inner border + gap + outer border */
+  border: 3px solid #39ff14;
+  outline: 3px solid #010801;
+  box-shadow:
+    0 0 0 6px #39ff14,          /* outer pixel border ring */
+    0 0 0 9px #010801,          /* gap ring */
+    0 0 20px rgba(57,255,20,0.3);
+  border-radius: 0;             /* NES has zero border radius */
+  display: none;
+  flex-direction: column;
+  overflow: hidden;
+  z-index: 50;
+  animation: windowOpen 0.1s steps(3) forwards; /* stepped = 8-bit feel */
+  image-rendering: pixelated;
+}
+
+.os-window.active { display: flex; }
+
+/* Window title bar — NES style header strip */
+.win-titlebar {
+  height: 28px;
+  background: #39ff14;          /* inverted = green background, black text */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 8px;
+  cursor: move;
+  flex-shrink: 0;
+}
+
+.win-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  color: #010801;               /* black text on green bar */
+  letter-spacing: 1px;
+}
+
+/* ✕ Close button — NES style */
+.win-close-btn {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  color: #010801;
+  cursor: pointer;
+  padding: 2px 4px;
+  border: 2px solid #010801;
+  line-height: 1;
+  transition: none;
+}
+
+.win-close-btn:hover {
+  background: #010801;
+  color: #39ff14;
+}
+
+/* Scrollable window body */
+.win-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 14px 16px;
+  scrollbar-width: thin;
+  scrollbar-color: #39ff14 #010801;
+}
+
+.win-body::-webkit-scrollbar { width: 6px; background: #010801; }
+.win-body::-webkit-scrollbar-thumb { background: #39ff14; }
+
+
+/* ────────────────────────────────────────────────────────────────
+   7. WINDOW CONTENT STYLES
+   ──────────────────────────────────────────────────────────────── */
+
+/* NES data field rows (NAME: VALUE) */
+.nes-field {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 6px;
+  font-family: 'VT323', monospace;
+  font-size: 18px;
+  line-height: 1.3;
+}
+
+.nes-label {
+  color: rgba(57,255,20,0.5);
+  min-width: 50px;
+  flex-shrink: 0;
+}
+
+.nes-val {
+  color: #39ff14;
+  text-shadow: 0 0 6px rgba(57,255,20,0.4);
+}
+
+/* Horizontal divider — NES style dashes */
+.nes-divider {
+  font-family: 'VT323', monospace;
+  font-size: 16px;
+  color: rgba(57,255,20,0.3);
+  margin: 10px 0;
+  letter-spacing: 1px;
+}
+
+/* Body text — VT323 for body is larger and very readable */
+.nes-text {
+  font-family: 'VT323', monospace;
+  font-size: 18px;
+  line-height: 1.5;
+  color: rgba(57,255,20,0.8);
+}
+
+/* Highlighted text inside paragraphs */
+.nes-highlight {
+  color: #39ff14;
+  text-shadow: 0 0 8px rgba(57,255,20,0.7);
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+}
+
+/* Subtitle line */
+.nes-subtitle {
+  font-family: 'VT323', monospace;
+  font-size: 16px;
+  color: rgba(57,255,20,0.45);
+  margin-bottom: 10px;
+  letter-spacing: 1px;
+}
+
+/* Pill tags — NES cartridge label style */
+.tag {
+  display: inline-block;
+  padding: 2px 7px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 6px;
+  margin: 3px 2px;
+  border: 2px solid #39ff14;
+  color: #39ff14;
+  background: rgba(57,255,20,0.06);
+  letter-spacing: 0.5px;
+  image-rendering: pixelated;
+}
+
+.tag-row { margin-top: 10px; }
+
+/* ── Skill Icon Grid ─────────────────────────────────────────────
+   Add a skill: copy a .skill-card in index.html.
+   Browse icons: https://devicon.dev
+   ──────────────────────────────────────────────────────────────── */
+.skill-category-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  color: #39ff14;
+  letter-spacing: 1px;
+  margin: 12px 0 7px;
+  text-shadow: 0 0 6px rgba(57,255,20,0.5);
+}
+
+.skill-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+}
+
+.skill-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  padding: 8px 4px;
+  background: #4b4f4b;
+  border: 2px solid rgba(57,255,20,0.2);
+  cursor: default;
+  transition: none;             /* no smooth transitions — stays 8-bit */
+  image-rendering: pixelated;
+}
+
+.skill-card:hover {
+  background: #2c2e2c;
+  border-color: #39ff14;
+  box-shadow: 0 0 6px rgba(57,255,20,0.3);
+}
+
+.skill-card img {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+  image-rendering: pixelated;
+  filter: saturate(0.6) brightness(0.9);
+}
+
+.skill-card:hover img { filter: saturate(1) brightness(1.1); }
+
+/* GitHub icon is dark — invert it */
+.icon-invert { filter: invert(0.85) saturate(0.4); }
+.skill-card:hover .icon-invert { filter: invert(0.9) saturate(0.6); }
+
+.skill-card span {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 5px;
+  color: rgba(57,255,20,0.6);
+  text-align: center;
+  letter-spacing: 0.3px;
+}
+
+/* ── Project Cards ───────────────────────────────────────────────
+   Add a project: copy a .proj-card block in index.html.
+   ──────────────────────────────────────────────────────────────── */
+.proj-card {
+  border: 2px solid rgba(57,255,20,0.25);
+  border-left: 4px solid #39ff14; /* thick left = NES menu cursor */
+  background: #010f01;
+  padding: 10px 12px;
+  margin-bottom: 8px;
+  transition: none;
+}
+
+.proj-card:hover {
+  border-left-color: #39ff14;
+  background: #021602;
+  box-shadow: inset 0 0 8px rgba(57,255,20,0.05);
+}
+
+/* Project card header row: icon + name + status badge */
+.proj-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 5px;
+}
+
+.proj-icon { font-size: 14px; }
+
+.proj-name {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 6px;
+  color: #39ff14;
+  flex: 1;
+  letter-spacing: 0.5px;
+}
+
+/* Status badge — like NES "COMPLETE" stamp */
+.proj-status {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 5px;
+  color: #39ff14;
+  border: 1px solid rgba(57,255,20,0.4);
+  padding: 2px 4px;
+  background: rgba(57,255,20,0.07);
+}
+
+.proj-card p {
+  font-family: 'VT323', monospace;
+  font-size: 16px;
+  color: rgba(57,255,20,0.6);
+  margin-bottom: 6px;
+  line-height: 1.4;
+}
+
+.proj-footer {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+/* GitHub link — NES [ BUTTON ] style */
+.proj-link {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 6px;
+  color: #39ff14;
+  text-decoration: none;
+  border: 2px solid #39ff14;
+  padding: 3px 6px;
+  margin-left: auto;
+  letter-spacing: 0.5px;
+  transition: none;
+}
+
+.proj-link:hover {
+  background: #39ff14;
+  color: #010801;
+}
+
+/* ── Education Items ─────────────────────────────────────────────
+   ──────────────────────────────────────────────────────────────── */
+.edu-item {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 16px;
+  align-items: flex-start;
+}
+
+/* The ▶ or ★ bullet point */
+.edu-dot {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  color: #39ff14;
+  flex-shrink: 0;
+  margin-top: 2px;
+  text-shadow: 0 0 6px rgba(57,255,20,0.6);
+}
+
+.edu-name {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  color: #39ff14;
+  margin-bottom: 3px;
+  letter-spacing: 0.5px;
+  line-height: 1.5;
+}
+
+.edu-org {
+  font-family: 'VT323', monospace;
+  font-size: 16px;
+  color: rgba(57,255,20,0.6);
+  margin-bottom: 2px;
+}
+
+.edu-yr {
+  font-family: 'VT323', monospace;
+  font-size: 14px;
+  color: rgba(57,255,20,0.35);
+  letter-spacing: 1px;
+}
+
+/* ── Contact Rows ────────────────────────────────────────────────
+   ──────────────────────────────────────────────────────────────── */
+.contact-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(57,255,20,0.1);
+}
+
+.contact-row:last-child { border-bottom: none; }
+
+.contact-icon {
+  font-size: 18px;
+  flex-shrink: 0;
+  width: 26px;
+  text-align: center;
+}
+
+.contact-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 6px;
+  color: rgba(57,255,20,0.4);
+  letter-spacing: 1px;
+  margin-bottom: 2px;
+}
+
+.contact-val,
+a.contact-val {
+  font-family: 'VT323', monospace;
+  font-size: 17px;
+  color: rgba(57,255,20,0.8);
+  text-decoration: none;
+  letter-spacing: 0.5px;
+}
+
+a.contact-val:hover {
+  color: #39ff14;
+  text-shadow: 0 0 6px rgba(57,255,20,0.5);
+}
+
+/* ── Resume Buttons ──────────────────────────────────────────────
+   NES-style [  YES  ] [  NO  ] choice buttons
+   ──────────────────────────────────────────────────────────────── */
+.resume-btn {
+  display: block;
+  width: 100%;
+  padding: 10px 8px;
+  background: #010f01;
+  border: 3px solid #39ff14;
+  color: #39ff14;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  cursor: pointer;
+  text-align: left;
+  margin-top: 8px;
+  letter-spacing: 0.5px;
+  text-decoration: none;
+  transition: none;
+  display: block;
+}
+
+.resume-btn:hover {
+  background: #39ff14;
+  color: #010801;
+}
+
+.resume-btn.secondary {
+  border-color: rgba(57,255,20,0.4);
+  color: rgba(57,255,20,0.6);
+}
+
+.resume-btn.secondary:hover {
+  background: rgba(57,255,20,0.15);
+  color: #39ff14;
+  border-color: #39ff14;
+}
+
+.resume-btn.ghost {
+  border-color: rgba(57,255,20,0.2);
+  color: rgba(57,255,20,0.3);
+  font-size: 6px;
+}
+
+.resume-btn.ghost:hover {
+  border-color: rgba(57,255,20,0.4);
+  color: rgba(57,255,20,0.6);
+  background: transparent;
+}
+
+
+/* ────────────────────────────────────────────────────────────────
+   8. TASKBAR / DOCK — NES bottom menu bar
+   ──────────────────────────────────────────────────────────────── */
+#taskbar {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  background: #000;
+  border-top: 3px solid #39ff14;
+}
+
+#dock {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+}
+
+.dock-btn {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  cursor: pointer;
+  border: 2px solid rgba(57,255,20,0.2);
+  background: #010f01;
+  transition: none;
+  image-rendering: pixelated;
+}
+
+.dock-btn:hover {
+  border-color: #39ff14;
+  background: #021402;
+  box-shadow: 0 0 8px rgba(57,255,20,0.4);
+}
+
+/* Active dot indicator — NES "selected" pixel */
+.dock-btn.running {
+  border-color: #39ff14;
+  box-shadow: 0 0 6px rgba(57,255,20,0.5);
+}
+
+.dock-btn.running::after {
+  /* No ::after dot — instead whole button stays highlighted */
+}
+
+/* Separator in dock */
+.dock-sep {
+  font-family: 'VT323', monospace;
+  font-size: 20px;
+  color: rgba(57,255,20,0.3);
+  margin: 0 4px;
+}
+
+
+/* ────────────────────────────────────────────────────────────────
+   9. WELCOME SPLASH SCREEN
+   ──────────────────────────────────────────────────────────────── */
+#welcome {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  z-index: 3;
+  pointer-events: none;
+  animation: welcomeFade 4s ease-out 1.5s both;
+}
+
+/* Big game title */
+.welcome-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 22px;
+  color: #39ff14;
+  letter-spacing: 3px;
+  text-shadow:
+    0 0 10px rgba(57,255,20,1),
+    0 0 30px rgba(57,255,20,0.5),
+    4px 4px 0 #1a8a00;   /* pixel drop shadow */
+  margin-bottom: 14px;
+}
+
+.welcome-sub {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  color: rgba(57,255,20,0.7);
+  letter-spacing: 2px;
+  margin-bottom: 6px;
+}
+
+.welcome-sub2 {
+  font-family: 'VT323', monospace;
+  font-size: 20px;
+  color: rgba(57,255,20,0.45);
+  letter-spacing: 3px;
+  margin-bottom: 20px;
+}
+
+/* Blinking PRESS START text */
+.press-start-blink {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  color: #39ff14;
+  letter-spacing: 1px;
+  animation: blink 1s step-end infinite;
+  text-shadow: 0 0 8px rgba(57,255,20,0.8);
+  margin-bottom: 10px;
+}
+
+/* Block cursor */
+.cursor-blink {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 14px;
+  color: #39ff14;
+  animation: blink 0.8s step-end infinite;
+}
+
+
+/* ────────────────────────────────────────────────────────────────
+   10. ANIMATIONS
+   Note: stepped animations (steps(N)) feel 8-bit / choppy.
+   ──────────────────────────────────────────────────────────────── */
+
+/* Window opens in 3 chunky steps instead of smoothly */
+@keyframes windowOpen {
+  from { opacity: 0; transform: scale(0.9); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+/* Welcome fades out */
+@keyframes welcomeFade {
+  0%   { opacity: 1; }
+  80%  { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* Blink — step-end keeps it a hard on/off toggle (not smooth) */
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
