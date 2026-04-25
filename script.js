@@ -1,5 +1,5 @@
 /* ================================================================
-   script.js — LAY.EXE Portfolio JavaScript
+   script.js — Portfolio - LayPatel JavaScript
    ================================================================
    1. Live clock (NES HUD format)
    2. Animated pixel rain background canvas
@@ -265,3 +265,81 @@ function dragEnd() {
   document.removeEventListener('mousemove', onDrag);
   document.removeEventListener('mouseup',   dragEnd);
 }
+
+
+/* ================================================================
+   MOBILE PANEL LOGIC
+   ================================================================
+   On mobile (≤768px), floating windows are hidden via CSS.
+   Instead, tapping an icon calls openWin(name) which ALSO calls
+   openMobilePanel(name) to show the full-screen panel.
+
+   HOW IT WORKS:
+   1. openMobilePanel(name) finds the hidden .os-window by ID
+   2. It copies its .win-title and .win-body content into #mobile-panel
+   3. It shows #mobile-panel by adding .active
+   4. closeMobilePanel() hides it again, returning to the icon grid
+   ================================================================ */
+
+/**
+ * isMobile()
+ * Returns true if the screen is narrow enough to be "mobile".
+ * 768px matches the CSS @media breakpoint above.
+ */
+function isMobile() {
+  return window.innerWidth <= 768;
+}
+
+/**
+ * openMobilePanel(name)
+ * Copies content from the hidden win-{name} into the mobile panel and shows it.
+ * Called automatically by openWin() when on mobile.
+ *
+ * @param {string} name - window name e.g. 'about', 'skills'
+ */
+function openMobilePanel(name) {
+  const win   = document.getElementById('win-' + name);
+  const panel = document.getElementById('mobile-panel');
+  const title = document.getElementById('mobile-panel-title');
+  const body  = document.getElementById('mobile-panel-body');
+
+  if (!win || !panel) return;
+
+  // Copy the title text from the window's titlebar
+  const winTitle = win.querySelector('.win-title');
+  if (winTitle) title.textContent = winTitle.textContent;
+
+  // Copy the window body HTML into the panel body
+  // We clone it so the original window is untouched
+  const winBody = win.querySelector('.win-body');
+  if (winBody) {
+    body.innerHTML = '';                          // clear old content
+    body.appendChild(winBody.cloneNode(true));    // paste clone in
+  }
+
+  panel.classList.add('active'); // show the panel (CSS: display:flex)
+  body.scrollTop = 0;            // always start scrolled to top
+}
+
+/**
+ * closeMobilePanel()
+ * Hides the mobile panel, returning the user to the icon grid.
+ * Called by the ◀ BACK button in the panel titlebar.
+ */
+function closeMobilePanel() {
+  const panel = document.getElementById('mobile-panel');
+  if (panel) panel.classList.remove('active');
+}
+
+/* ── Hook into existing openWin() ────────────────────────────────
+   We wrap the original openWin so that on mobile it ALSO opens
+   the mobile panel instead of (or in addition to) the desktop window.
+   The desktop window stays hidden via CSS on mobile anyway.
+   ──────────────────────────────────────────────────────────────── */
+const _originalOpenWin = openWin;
+openWin = function(name) {
+  _originalOpenWin(name);         // always run the original (handles dock dot etc.)
+  if (isMobile()) {
+    openMobilePanel(name);        // additionally open the mobile panel on small screens
+  }
+};

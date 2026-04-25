@@ -1,6 +1,4 @@
 <!--I am using skill category label Id with my certification label too. and also contact-val class too.-->
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -499,6 +497,19 @@
         <div class="dock-btn" id="dock-resume"    title="Resume"    onclick="openWin('resume')">📜</div>
       </div>
     </div>
+
+  <!-- ── MOBILE PANEL ──────────────────────────────────────────────
+       This is ONLY visible on mobile (≤768px).
+       JavaScript clones the clicked window content into #mobile-panel-body
+       and shows this panel instead of the floating window.
+       ──────────────────────────────────────────────────────────────── -->
+  <div id="mobile-panel">
+    <div id="mobile-panel-titlebar">
+      <div id="mobile-panel-title">[ MENU ]</div>
+      <div id="mobile-panel-back" onclick="closeMobilePanel()">◀ BACK</div>
+    </div>
+    <div id="mobile-panel-body"></div>
+  </div>
 
   </div><!-- end #os-root -->
 

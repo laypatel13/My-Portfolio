@@ -1,5 +1,5 @@
 /* ================================================================
-   style.css — LAY.EXE Portfolio
+   style.css — Portfolio - LayPatel
    THEME: 8-bit NES + Green Phosphor Terminal
    ================================================================
    MAIN GREEN:   #39ff14  (phosphor bright green)
@@ -827,4 +827,194 @@ a.contact-val:hover {
 @keyframes blink {
   0%, 100% { opacity: 1; }
   50%       { opacity: 0; }
+}
+
+
+/* ================================================================
+   RESPONSIVE / MOBILE STYLES
+   ================================================================
+   HOW THIS WORKS:
+   - On desktop (>768px): the OS desktop + floating windows stay as-is
+   - On mobile (≤768px): we switch to a full-screen "game menu" layout
+     where icons are a grid, and tapping one opens a full-screen panel
+
+   The trick is:
+   1. We HIDE the draggable .os-window elements on mobile
+   2. We SHOW a #mobile-panel overlay instead when an icon is tapped
+   3. JavaScript fills #mobile-panel with the clicked window's content
+   ================================================================ */
+
+@media (max-width: 768px) {
+
+  /* ── Body & root ─────────────────────────────────────────────── */
+  body {
+    align-items: flex-start;  /* don't try to vertically center on mobile */
+    padding: 0;
+  }
+
+  #os-root {
+    /* Fill the whole phone screen — no fixed 860px cap */
+    max-width: 100%;
+    width: 100%;
+    height: 100vh;
+    height: 100dvh; /* dvh = accounts for mobile browser chrome */
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+    /* Keep the top/bottom green borders for the NES feel */
+    outline: none;
+    box-shadow: none;
+  }
+
+  /* ── Topbar — shrink it on mobile ───────────────────────────── */
+  #topbar {
+    height: 26px;
+    padding: 0 8px;
+    font-size: 6px;
+  }
+
+  /* Hide the center text on very small screens — saves space */
+  #topbar-center { display: none; }
+
+  #topbar-left  { font-size: 6px; }
+  #topbar-right { font-size: 6px; }
+
+  /* ── Desktop area — becomes a scrollable icon grid ───────────── */
+  #desktop {
+    top: 26px;
+    bottom: 46px;
+    overflow-y: auto;
+    /* Switch from absolute-positioned icons to a centered flex grid */
+    display: flex;
+    flex-wrap: wrap;
+    align-content: center;
+    justify-content: center;
+    gap: 16px;
+    padding: 20px 16px;
+  }
+
+  /* ── Welcome splash — HIDDEN on mobile ──────────────────────────
+     On desktop the splash has room to breathe and looks great.
+     On phone screens the big title, subtitle, blinking text and
+     cursor all crush together and overlap — looks broken.
+     Cleanest fix: skip it on mobile entirely. Users land straight
+     on the icon grid which is clean and immediately usable.
+     Desktop (>768px) is completely unaffected — splash still plays.
+     To bring it back on mobile, delete just these 3 lines below.
+     ──────────────────────────────────────────────────────────────── */
+  #welcome {
+    display: none !important;
+  }
+
+  /* ── Icons — override the absolute positioning ───────────────── */
+  /* Each icon was position:absolute with top/left set inline.
+     On mobile we reset that so they flow in the flex grid above. */
+  .app-icon {
+    position: relative !important; /* overrides the inline style */
+    top: auto !important;
+    left: auto !important;
+    width: 80px;
+  }
+
+  .icon-box {
+    width: 60px;
+    height: 60px;
+  }
+
+  .icon-label { font-size: 5px; }
+
+  /* ── Hide ALL floating windows on mobile ─────────────────────── */
+  /* On desktop these are draggable overlays. On mobile we replace
+     them with the full-screen #mobile-panel below. */
+  .os-window {
+    display: none !important;
+  }
+
+  /* ── Taskbar — make it thinner on mobile ─────────────────────── */
+  #taskbar {
+    height: 46px;
+  }
+
+  .dock-btn {
+    width: 30px;
+    height: 30px;
+    font-size: 14px;
+  }
+
+  .dock-sep { margin: 0 2px; font-size: 16px; }
+
+  /* ── Mobile full-screen panel ────────────────────────────────────
+     This replaces the floating windows on mobile.
+     It's a full-screen overlay that slides up when you tap an icon.
+     JavaScript adds .active to show it, and fills it with content.
+     ──────────────────────────────────────────────────────────────── */
+  #mobile-panel {
+    display: none; /* shown via JS when active */
+    position: absolute;
+    inset: 26px 0 46px 0; /* sits between topbar and taskbar */
+    background: #010801;
+    z-index: 200;
+    flex-direction: column;
+    overflow: hidden;
+    /* Slide up animation */
+    animation: slideUp 0.15s steps(3) forwards;
+  }
+
+  #mobile-panel.active {
+    display: flex;
+  }
+
+  /* Panel title bar — same NES green bar as windows */
+  #mobile-panel-titlebar {
+    height: 28px;
+    background: #39ff14;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 10px;
+    flex-shrink: 0;
+  }
+
+  #mobile-panel-title {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 7px;
+    color: #010801;
+    letter-spacing: 1px;
+  }
+
+  /* Back button — closes the panel, returns to icon grid */
+  #mobile-panel-back {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 7px;
+    color: #010801;
+    cursor: pointer;
+    padding: 2px 6px;
+    border: 2px solid #010801;
+  }
+
+  /* The scrollable content area inside the panel */
+  #mobile-panel-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+    scrollbar-width: thin;
+    scrollbar-color: #39ff14 #010801;
+  }
+
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+} /* end @media mobile */
+
+/* ── Tablet tweaks (768px–1024px) ────────────────────────────────
+   The desktop layout works but windows might be tight.
+   We scale the OS container slightly so it fits without scrolling.
+   ──────────────────────────────────────────────────────────────── */
+@media (min-width: 769px) and (max-width: 1024px) {
+  #os-root {
+    max-width: 100%;
+    height: calc(100vh - 32px);
+  }
 }
